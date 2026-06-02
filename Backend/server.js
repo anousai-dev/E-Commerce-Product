@@ -15,7 +15,6 @@ readdirSync('./src/services').map((item)=> app.use('/api', require(`./src/servic
 
 
 
-
 // 5001 = env.PORT || 5001
 app.listen(5001, () => {
   console.log('Server is running on port 5001');
