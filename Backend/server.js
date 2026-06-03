@@ -3,6 +3,9 @@ const app = express();
 const morgan = require('morgan');
 const {readdirSync} = require('fs');
 const cors = require('cors');
+require("dotenv").config();
+
+const port = process.env.PORT || 5001;
 
 // Middlewares
 app.use(cors());
@@ -16,6 +19,6 @@ readdirSync('./src/services').map((item)=> app.use('/api', require(`./src/servic
 
 
 // 5001 = env.PORT || 5001
-app.listen(5001, () => {
-  console.log('Server is running on port 5001');
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });

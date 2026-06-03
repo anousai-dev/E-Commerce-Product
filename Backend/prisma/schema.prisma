@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String? //ค่าว่างได้
+  name     String? //ค่าว่างได้
+  picture  String? //ค่าว่างได้
+  role     String  @default("USER") //USER = ผู้ใช้ , ADMIN = ผู้ดูแลระบบ
+  enabled  Boolean @default(true) //true = เปิดใช้งาน , false = ปิดใช้งาน
+  address  String? //ค่าว่างได้
+
+  order Order[] //สั่งซื้อ
+  cart  Cart[] //ตะกร้า
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // @@map("users")
+}
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  stock       Int    
+  sold        Int    @default(0)
+  image       String
+
+  orderItems ProductOnOrder[]
+  cartItems  ProductOnCart[]
+  images     Image[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // @@map("products")
+}
+
+model Order {
+  id          Int    @id @default(autoincrement())
+  cartTotal   Float
+  orderStatus String @default("No process") //No process = ยังไม่ดำเนินการ , Processing = กำลังดำเนินการ , Shipping = กำลังจัดส่ง , Delivered = จัดส่งเรียบร้อยแล้ว 
+
+  orderItems ProductOnOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderBy   User @relation(fields: [orderById], references: [id])
+  orderById Int
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id        Int             @id @default(autoincrement())
+  cartTotal Float           @default(0)
+  products  ProductOnCart[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderBy   User @relation(fields: [orderById], references: [id])
+  orderById Int
+}
+
+model Image {
+  id         Int    @id @default(autoincrement())
+  asset_id   String //รหัสทรัพย์สิน
+  public_id  String //รหัสสาธารณะ
+  url        String //ที่อยู่รูปภาพ
+  secure_url String //ที่อยู่รูปภาพที่ปลอดภัย
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+}
+
+// ----------------
+// Product On Order หนึ่งสินค้าสามารถมีได้หลายคำสั่งซื้อ
+
+model ProductOnOrder {
+  id Int @id @default(autoincrement())
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+
+  count Int
+  price Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Product On Cart
+
+model ProductOnCart {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+
+  count Int
+  price Float
+}
