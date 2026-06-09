@@ -14,7 +14,7 @@ app.use(express.json()); // Parse JSON request bodies
 
 
 // routes
-readdirSync('./src/services').map((item)=> app.use('/api', require(`./src/services/${item}`)));
+readdirSync('./src/router').map((item)=> app.use('/api', require(`./src/router/${item}`)));
 
 
 

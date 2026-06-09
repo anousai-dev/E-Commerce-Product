@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
 
@@ -36,9 +36,8 @@ model Product {
   title       String
   description String
   price       Float
-  stock       Int    
+  stock       Int
   sold        Int    @default(0)
-  image       String
 
   orderItems ProductOnOrder[]
   cartItems  ProductOnCart[]
@@ -48,6 +47,8 @@ model Product {
   updatedAt DateTime @updatedAt
 
   // @@map("products")
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
 }
 
 model Order {
@@ -65,10 +66,11 @@ model Order {
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Cart {
@@ -121,9 +123,9 @@ model ProductOnCart {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  cart      Cart     @relation(fields: [cartId], references: [id])
   cartId    Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
 
   count Int
