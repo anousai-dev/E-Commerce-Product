@@ -58,12 +58,14 @@ exports.login = async(req, res) => {
     
     
     // Create payload
+    // เพื่อดืงข้อมูล DB มาบันทืกเข้า Token 
     const payload ={
       id:user.id,
       email:user.email,
       role:user.role
     }
     // Create token
+    // เหมือนทำ บัตร ประชาชน 
     jwt.sign(payload, process.env.JWT_SECRET,{expiresIn: "1d"}, (err,token)=>{
       if(err){
         return res.status(500).json({message: "Error signing token"})
